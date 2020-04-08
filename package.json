@@ -10,7 +10,7 @@
     "dev": "nodemon -w ./src -w ./src/queries -w './test/*.test.js' --ext '.js,.ejs' -x 'npm run test'",
     "build": "npm run docs && sudo npm link && npm shrinkwrap",
     "upload": "npm run build && npm run test && git add . && git commit && git push",
-    "docs": "javadoc -i src/*.js -o docs/README.api.md -f markdown && concat docs/README.ini.md docs/README.api.md docs/README.end.md -o README.md",
+    "docs": "javadoc -i src/queries/*.sql.ejs src/*.js -o docs/README.api.md -f markdown && concat docs/README.ini.md docs/README.api.md docs/README.end.md -o README.md",
     "test": "mocha --sort --bail test/*.test.js",
     "cover": "nyc --reporter=html mocha --sort --bail test/**/*.test.js"
   },
@@ -38,6 +38,7 @@
     "ejs": "^3.0.2",
     "mysql": "^2.18.1",
     "sqlstring": "^2.3.1",
+    "string-argv": "^0.3.1",
     "yargs": "^15.3.1"
   }
 }

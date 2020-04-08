@@ -1,5 +1,19 @@
 <%
 
+/**
+ * 
+ * -----
+ * 
+ * #### `jobs.find(whereJob:Object|Array)`
+ * 
+ * @type Method
+ * @parameter
+ * @parameter  - `whereJob:Object|Array`. Required. Conditions that need to be met to list the job of the database as 'found'.
+ * @return `Promise`
+ * @description Returns jobs that accomplish some condition/s.
+ * 
+ */
+
 const jobsTable = "$jobs$" + scope.settings.tablename;
 let whereJobs = [];
 if(args.length !== 0) {

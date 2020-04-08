@@ -1,5 +1,19 @@
 <%
-	
+
+/**
+ * 
+ * -----
+ * 
+ * #### `jobs.create(values:Object)`
+ * 
+ * @type Method
+ * @parameter
+ * @parameter  - `values:Object`. Required. Values of the new job in database.
+ * @return `Promise`
+ * @description Creates a new job in the database.
+ * 
+ */
+
 if(args.length === 0) {
 	throw new Error("Argument 1 is required to <create>");
 }

@@ -7,17 +7,29 @@ describe("MySQLJobs API", function() {
 	
 	this.timeout(1000 * 5);
 
-	let jobSystem = MySQLJobs.create({
-		// trace: true,
-		settings: {
-			connection: {
-				database: "jobs_sample",
-				user: "test",
-				password: "test",
-				host: "127.0.0.1",
-				port: 3306
+	let jobSystem = undefined;
+
+	before(done => {
+		jobSystem = MySQLJobs.create({
+			// trace: true,
+			settings: {
+				connection: {
+					database: "jobs_sample",
+					user: "test",
+					password: "test",
+					host: "127.0.0.1",
+					port: 3306
+				}
 			}
+		});
+		done();
+	});
+
+	after(done => {
+		if(jobSystem) {
+			jobSystem.end();
 		}
+		done();
 	});
 
 	it("can be instantiated", function(done) {
@@ -174,7 +186,7 @@ describe("MySQLJobs API", function() {
 			await jobSystem.createTables();
 			await jobSystem.create({ name: "node job 1", dispatcher: "node@test/dev/write-hello.js" });
 			const { data, jobs } = await jobSystem.start({ name: "node job 1" });
-			
+
 			await jobSystem.deleteTables();
 		} catch(error) {
 			throw error;

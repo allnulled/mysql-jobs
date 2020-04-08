@@ -1,3 +1,20 @@
+<%
+	
+/**
+ * 
+ * -----
+ * 
+ * #### `jobs.createTables()`
+ * 
+ * @type Method
+ * @return `Promise`
+ * @description Creates the database tables, if they do not exist.
+ * 
+ */
+
+
+%>
+
 CREATE TABLE IF NOT EXISTS $jobs$<%-scope.settings.tablename%> (
 	id INT PRIMARY KEY AUTO_INCREMENT,
 	name VARCHAR(1023) UNIQUE,

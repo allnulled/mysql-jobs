@@ -1,1 +1,17 @@
+<%
+	
+/**
+ * 
+ * -----
+ * 
+ * #### `jobs.deleteTables()`
+ * 
+ * @type Method
+ * @return `Promise`
+ * @description Deletes the database tables, if they exist.
+ * 
+ */
+
+%>
+
 DROP TABLE IF EXISTS $jobs$<%-scope.settings.tablename%>;

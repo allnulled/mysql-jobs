@@ -1,5 +1,19 @@
 <%
 
+/**
+ * 
+ * -----
+ * 
+ * #### `jobs.delete(whereJob:Object|Array)`
+ * 
+ * @type Method
+ * @parameter
+ * @parameter  - `whereJob:Object|Array`. Required. Conditions that need to be met to delete the job in the database.
+ * @return `Promise`
+ * @description Deletes all jobs that acomplish certain condition/s.
+ * 
+ */
+
 let whereJobs = [];
 const jobsTable = "$jobs$" + scope.settings.tablename;
 if(args.length !== 0) {

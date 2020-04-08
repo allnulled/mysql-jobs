@@ -3,6 +3,7 @@ const mysql = require("mysql");
 const debug = require("debug");
 const SQL = require("sqlstring");
 const fs = require("fs");
+const path = require("path");
 const utils = require("@allnulled/sql-utils");
 const noop = () => {};
 
@@ -80,7 +81,7 @@ class JobSystem {
 		this.$trace = debug("mysql-job:trace");
 		this.$debug = debug("mysql-job:debug");
 		this.$error = debug("mysql-job:error");
-		debug.enable("mysql-job:error" + (this.trace?",mysql-job:trace":"") + ((this.trace||this.debug)?",mysql-job:debug":""));
+		debug.enable("mysql-job:error" + (this.trace ? ",mysql-job:trace" : "") + ((this.trace || this.debug) ? ",mysql-job:debug" : ""));
 		this.$initializeTemplates();
 		this.$initializeConnection();
 		process.on("exit", () => this.stop());
@@ -96,7 +97,7 @@ class JobSystem {
 					return this.$renderQueryTo(method, ...args);
 				}
 			});
-		} catch(error) {
+		} catch (error) {
 			this.$error("Error on <$initializeTemplates>:", error);
 			throw error;
 		}
@@ -104,15 +105,15 @@ class JobSystem {
 
 	$initializeConnection() {
 		this.$trace("$initializeConnection");
-		if(this.connection) {
+		if (this.connection) {
 			return;
 		}
-		if(typeof this.settings.connection !== "object") {
+		if (typeof this.settings.connection !== "object") {
 			throw new Error("Property <settings.connection> must be an object to <$initializeConnection>");
 		}
 		try {
 			this.connection = mysql.createConnection(this.settings.connection);
-		} catch(error) {
+		} catch (error) {
 			this.$error("Error on <$initializeConnection>:", error);
 			throw error;
 		}
@@ -121,26 +122,28 @@ class JobSystem {
 	async $renderQueryTo(method, ...args) {
 		this.$trace("$renderQueryTo");
 		try {
-			if(!(method in this.queries)) {
+			if (!(method in this.queries)) {
 				throw new Error("Property <queries." + method + "> is required to <$renderQueryTo>");
 			}
 			const queryTemplate = this.queries[method];
 			let querySource;
 			try {
-				querySource = this.$render(queryTemplate, { args });
-			} catch(error) {
+				querySource = this.$render(queryTemplate, {
+					args
+				});
+			} catch (error) {
 				this.$error("Error on <$render> for <" + method + ">");
 				throw error;
 			}
 			let output;
 			try {
 				output = await this.$query(querySource);
-			} catch(error) {
+			} catch (error) {
 				this.$error("Error on <$query> for <" + method + ">");
 				throw error;
 			}
 			return output;
-		} catch(error) {
+		} catch (error) {
 			this.$error("Error on <$renderQueryTo> for <" + method + ">", error);
 			throw error;
 		}
@@ -153,9 +156,18 @@ class JobSystem {
 
 	$createTemplateParameters(parameters = {}) {
 		this.$trace("$createTemplateParameters");
-		const templateParameters = { ...parameters, scope: this, process, ejs, fs, SQL, utils, };
+		const templateParameters = { ...parameters,
+			scope: this,
+			process,
+			ejs,
+			fs,
+			SQL,
+			utils,
+		};
 		templateParameters.createTemplateParameters = this.$createTemplateParameters.bind(this);
-		templateParameters.parameters = { ...templateParameters, parameters: null };
+		templateParameters.parameters = { ...templateParameters,
+			parameters: null
+		};
 		return templateParameters;
 	}
 
@@ -164,10 +176,13 @@ class JobSystem {
 		this.$debug("[SQL] " + querySource);
 		return new Promise((ok, fail) => {
 			this.connection.query(querySource, (error, data, fields) => {
-				if(error) {
+				if (error) {
 					return fail(error);
 				}
-				return ok({ data, fields, });
+				return ok({
+					data,
+					fields,
+				});
 			});
 		});
 	}
@@ -175,27 +190,57 @@ class JobSystem {
 	async $dispatch(job) {
 		this.$trace("$dispatch");
 		try {
-			const { data: { affectedRows } } = await this.lock({ id: job.id });
-			if(affectedRows !== 1) {
-				throw new Error()
+			const {
+				data: {
+					affectedRows
+				}
+			} = await this.lock({
+				id: job.id
+			});
+			if (affectedRows !== 1) {
+				throw new Error("Job could not be locked");
 			}
 			const dispatcher = this.$createDispatcher(job);
 			this.activeJobs[job.name] = dispatcher;
 			return await dispatcher;
-		} catch(error) {
+		} catch (error) {
 			this.$error("Error on <$dispatch>:", error);
 			throw error;
 		}
 	}
 
 	$createDispatcher(job) {
-		const [ program, parameters = "" ] = job.dispatcher.split("@");
+		const [program, parameters = ""] = job.dispatcher.split("@");
 		const dispatcher = {};
 		dispatcher.promise = new Promise((resolve, reject) => {
 			dispatcher.$job = job;
 			dispatcher.$resolve = resolve;
 			dispatcher.$reject = reject;
-			setTimeout(resolve, 1000);
+			if (program === "node") {
+				const mod = require(path.resolve(parameters));
+				if (typeof mod !== "function") {
+					throw new Error("Error on dispatcher");
+				}
+				const result = mod(job, this);
+				if (result instanceof Promise) {
+					result.then(data => {
+						resolve(data);
+					});
+				} else {
+					setImmediate(resolve, result);
+				}
+			} else if (program === "cmd") {
+				const args = stringArgv(parameters);
+				const command = args.shift();
+				const subprocess = require("child_process").spawn(command, args, {
+					cwd: process.cwd(),
+					detached: true,
+					stdio: "inherit"
+				});
+				subprocess.on("close", code => resolve(code));
+			} else {
+				throw new Error(`Job ${job.name} (ID: ${job.id}) has unrecognized dispatcher method: ${program}`);
+			}
 		});
 		return dispatcher;
 	}
@@ -217,15 +262,21 @@ class JobSystem {
 		this.$trace("start");
 		try {
 			let whereJobs = undefined;
-			if(Array.isArray(whereJobsP)) {
+			if (Array.isArray(whereJobsP)) {
 				whereJobs = [].concat(whereJobsP);
 				whereJobs.push(["is_locked", "=", 0]);
-			} else if(typeof whereJobsP === "object") {
-				whereJobs = Object.assign({}, whereJobsP, { is_locked: 0 });
+			} else if (typeof whereJobsP === "object") {
+				whereJobs = Object.assign({}, whereJobsP, {
+					is_locked: 0
+				});
 			} else {
 				throw new Error("Argument 1 must be an array or an object to <start>");
 			}
-			const { data: activableJobs } = await this.find(whereJobs, { limit: this.settings.maxActiveJobs - Object.keys(this.activeJobs).length });
+			const {
+				data: activableJobs
+			} = await this.find(whereJobs, {
+				limit: this.settings.maxActiveJobs - Object.keys(this.activeJobs).length
+			});
 			const jobDispatchers = activableJobs.map(job => this.$dispatch(job));
 			this.$debug(`Started ${jobDispatchers.length} jobs`);
 			return await Promise.all(jobDispatchers).then(jobsData => {
@@ -234,7 +285,7 @@ class JobSystem {
 					jobs: activableJobs
 				};
 			});
-		} catch(error) {
+		} catch (error) {
 			this.$error("Error on <start>:", error);
 			throw error;
 		}
@@ -257,15 +308,19 @@ class JobSystem {
 		this.$trace("stop");
 		try {
 			let whereJobs = undefined;
-			if(Array.isArray(whereJobsP)) {
+			if (Array.isArray(whereJobsP)) {
 				whereJobs = [].concat(whereJobsP);
 				whereJobs.push(["is_locked", "=", 1]);
-			} else if(typeof whereJobsP === "object") {
-				whereJobs = Object.assign({}, whereJobsP, { is_locked: 1 });
+			} else if (typeof whereJobsP === "object") {
+				whereJobs = Object.assign({}, whereJobsP, {
+					is_locked: 1
+				});
 			} else {
 				throw new Error("Argument 1 must be an array or an object to <stop>");
 			}
-			const { data: deactivableJobs } = await this.find(whereJobs);
+			const {
+				data: deactivableJobs
+			} = await this.find(whereJobs);
 			const jobDispatchers = deactivableJobs.map(job => this.$dispatch(job));
 			this.$debug(`Started ${jobDispatchers.length} jobs`);
 			return await Promise.all(jobDispatchers).then(jobsData => {
@@ -274,7 +329,7 @@ class JobSystem {
 					jobs: deactivableJobs
 				};
 			});
-		} catch(error) {
+		} catch (error) {
 			this.$error("Error on <stop>:", error);
 			throw error;
 		}
@@ -293,6 +348,29 @@ class JobSystem {
 	 */
 	status() {
 		this.$trace("status");
+	}
+
+	/**
+	 * 
+	 * -----
+	 * 
+	 * #### `jobs.end()`
+	 * 
+	 * @type Method.
+	 * @returns `undefined`.
+	 * @description Closes the database connection created on the constructor. If you do not call this method, the process will hang.
+	 * 
+	 */
+	end() {
+		try {
+			if(this.connection) {
+				this.connection.end();
+			} else {
+				throw new Error("No connection found to <end>");
+			}
+		} catch(error) {
+			this.$error("Error on <end>:", error);
+		}
 	}
 
 }

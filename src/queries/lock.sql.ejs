@@ -1,5 +1,19 @@
 <%
 
+/**
+ * 
+ * -----
+ * 
+ * #### `jobs.lock(whereJob:Object|Array)`
+ * 
+ * @type Method
+ * @parameter
+ * @parameter  - `whereJob:Object|Array`. Required. Conditions that need to be met to lock some job/s of the database.
+ * @return `Promise`
+ * @description Sets the flag of `is_locked` to `1` in the database.
+ * 
+ */
+
 const jobsTable = "$jobs$" + scope.settings.tablename;
 if(args.length < 1) {
 	throw new Error("Argument 1 is required to <lock>");

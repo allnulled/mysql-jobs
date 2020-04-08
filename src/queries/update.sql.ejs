@@ -1,5 +1,20 @@
 <%
 
+/**
+ * 
+ * -----
+ * 
+ * #### `jobs.update(whereJob:Object|Array)`
+ * 
+ * @type Method
+ * @parameter
+ * @parameter  - `whereJob:Object|Array`. Required. Conditions that need to be met to unlock some job/s of the database.
+ * @parameter  - `values:Object`. Required. Values to be set to the jobs found by the `whereJob` conditions.
+ * @return `Promise`
+ * @description Sets any value of the database to any job that mets the passed conditions.
+ * 
+ */
+
 const jobsTable = "$jobs$" + scope.settings.tablename;
 if(args.length < 2) {
 	throw new Error("Argument 1 and 2 are required to <update>");
