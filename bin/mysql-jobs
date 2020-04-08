@@ -1,0 +1,201 @@
+#! /usr/bin/env node
+
+const path = require("path");
+const pkg = require(__dirname + "/../package.json");
+const SQLUtils = require("@allnulled/sql-utils");
+const cli = require("yargs")
+	.usage("Usage: $0 [command] [options]")
+	.command("$0", "Manage MySQL scheduled tasks bound to time patterns", (yargs) => {
+		return yargs
+			.default("command", "help")
+			.hide("command")
+			.options("user", {
+				type: "string",
+				describe: "User of the database",
+				demand: false,
+				default: "test"
+			})
+			.options("password", {
+				type: "string",
+				describe: "Password of the user",
+				demand: false,
+				default: "test"
+			})
+			.options("database", {
+				type: "string",
+				describe: "Name of the database",
+				demand: false,
+				default: "test"
+			})
+			.options("host", {
+				type: "string",
+				describe: "IP of the database",
+				demand: false,
+				default: "127.0.0.1"
+			})
+			.options("port", {
+				type: "boolean",
+				describe: "Port of the database",
+				demand: false,
+				default: 3306
+			})
+			.options("debug", {
+				type: "boolean",
+				describe: "Print debug",
+				demand: false,
+				default: false
+			})
+			.options("trace", {
+				type: "string",
+				describe: "Print debug and more",
+				demand: false,
+				default: false
+			})
+			.options("configurations", {
+				type: "string",
+				describe: "Script to pass options and/or commands",
+				demand: false,
+				default: false
+			})
+			.options("parameters", {
+				type: "array",
+				describe: "List of extra parameters",
+				demand: false,
+				default: [0,1,2]
+			})
+			.options("where-job", {
+				type: "array",
+				describe: "SQL expressions: <column> <value> <col...",
+				demand: false,
+				default: []
+			})
+			.options("values", {
+				type: "array",
+				describe: "Pairs of key and value for one job",
+				demand: false,
+				default: []
+			})
+			.command("find", "Find jobs", (yargs) => yargs.default("command", "find"))
+			.command("create", "Create a new job", (yargs) => yargs.default("command", "create"))
+			.command("update", "Update jobs", (yargs) => yargs.default("command", "update"))
+			.command("delete", "Delete jobs", (yargs) => yargs.default("command", "delete"))
+			.command("lock", "Lock jobs", (yargs) => yargs.default("command", "lock"))
+			.command("unlock", "Unlock jobs", (yargs) => yargs.default("command", "lock"))
+			.command("start", "Start jobs", (yargs) => yargs.default("command", "start"))
+			.command("stop", "Stop jobs", (yargs) => yargs.default("command", "stop"))
+			.command("status", "Show status of the jobs", (yargs) => yargs.default("command", "print-status"))
+	})
+	.version(pkg.version)
+	.help()
+	.wrap(110)
+	.argv;
+
+///////////////////////////////////////////////////////////////////////////////////
+
+if(typeof cli === "string") {
+	console.log(cli);
+	return;
+} else {
+	console.log(cli);
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+
+const MySQLJobs = require(path.resolve(__dirname, "..", pkg.main));
+const connectionSettings = (() => {
+	// @TODO: config or pick 1 by 1
+	let user = "test", password = "test", database = "test", host = "127.0.0.1", port = 3306;
+	if(cli.configurations) {
+		try {
+			cli.configurations = require(path.resolve(cli.configurations));
+		} catch(error) {
+			console.error("Error loading configurations", error);
+			return;
+		}
+	} else {
+		cli.configurations = {
+			user: cli.user,
+			password: cli.password,
+			database: cli.database,
+			host: cli.host,
+			port: cli.port,
+		};
+	}
+	return Object.assign({ user, password, database, host, port, }, cli.configurations);
+})();
+
+///////////////////////////////////////////////////////////////////////////////////
+
+const mysqlJobs = MySQLJobs.create({ settings: { connection: connectionSettings } });
+
+///////////////////////////////////////////////////////////////////////////////////
+
+const adaptWhere = (whereParam) => {
+	whereParam.forEach(whereRule => {
+
+	});
+};
+const adaptValues = (valuesParam) => {
+	// @TODO...
+};
+
+///////////////////////////////////////////////////////////////////////////////////
+
+switch(cli.command) {
+	case "delete-tables": {
+		mysqlJobs.deleteTables().then(console.log);
+		break;
+	}
+	case "create-tables": {
+		mysqlJobs.createTables().then(console.log);
+		break;
+	}
+	case "find": {
+		const whereJob = adaptWhere(cli.whereJob);
+		mysqlJobs.find(whereJob).then(console.log);
+		break;
+	}
+	case "create": {
+		const values = adaptValues(cli.values);
+		mysqlJobs.create(values).then(console.log);
+		break;
+	}
+	case "update": {
+		const whereJob = adaptWhere(cli.whereJob);
+		const values = adaptValues(cli.values);
+		mysqlJobs.update(whereJob, values).then(console.log);
+		break;
+	}
+	case "delete": {
+		const whereJob = adaptWhere(cli.whereJob);
+		mysqlJobs.delete(whereJob).then(console.log);
+		break;
+	}
+	case "lock": {
+		const whereJob = adaptWhere(cli.whereJob);
+		mysqlJobs.lock(whereJob).then(console.log);
+		break;
+	}
+	case "unlock": {
+		const whereJob = adaptWhere(cli.whereJob);
+		mysqlJobs.unlock(whereJob).then(console.log);
+		break;
+	}
+	case "start": {
+		const whereJob = adaptWhere(cli.whereJob);
+		mysqlJobs.start(whereJob).then(console.log);
+		break;
+	}
+	case "stop": {
+		const whereJob = adaptWhere(cli.whereJob);
+		mysqlJobs.stop(whereJob).then(console.log);
+		break;
+	}
+	case "status": {
+		mysqlJobs.status();
+		break;
+	}
+	default: {
+		throw new Error("Argument --command must be one of: print-status|find|create|update|delete|lock|unlock|start|stop|help, but <" + cli.command + "> was found");
+	}
+}

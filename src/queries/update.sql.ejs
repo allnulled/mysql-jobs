@@ -1,0 +1,25 @@
+<%
+
+const jobsTable = "$jobs$" + scope.settings.tablename;
+if(args.length < 2) {
+	throw new Error("Argument 1 and 2 are required to <update>");
+}
+if(typeof args[0] !== "object") {
+	throw new Error("Argument 1 must be an object to <update>");
+}
+if(typeof args[1] !== "object") {
+	throw new Error("Argument 2 must be an object to <update>");
+}
+
+const whereJobs = utils.whereToSQL(args[0], jobsTable);
+const values = args[1];
+
+%>
+
+UPDATE <%-jobsTable%>
+	SET <%- 
+	Object.keys(values)
+		.map((prop) => SQL.escapeId(prop) + " = " + SQL.escape(values[prop]))
+		.join(", ")
+	%>
+	WHERE <%- whereJobs %>

@@ -1,0 +1,13 @@
+<%
+
+let whereJobs = [];
+const jobsTable = "$jobs$" + scope.settings.tablename;
+if(args.length !== 0) {
+	whereJobs = utils.whereToSQL(args[0], jobsTable);
+}
+
+%>
+
+DELETE
+	FROM <%-jobsTable%> 
+	WHERE <%-whereJobs%>;

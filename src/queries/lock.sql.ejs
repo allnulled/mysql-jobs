@@ -1,0 +1,18 @@
+<%
+
+const jobsTable = "$jobs$" + scope.settings.tablename;
+if(args.length < 1) {
+	throw new Error("Argument 1 is required to <lock>");
+}
+if(typeof args[0] !== "object") {
+	throw new Error("Argument 1 must be an object to <lock>");
+}
+
+const whereJobs = utils.whereToSQL(args[0], jobsTable);
+
+%>
+
+UPDATE <%-jobsTable%>
+	SET <%-SQL.escapeId(jobsTable)%>.`is_locked` = 1
+	WHERE <%-SQL.escapeId(jobsTable)%>.`is_locked` = 0
+		AND <%- whereJobs %>

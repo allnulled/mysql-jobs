@@ -1,0 +1,33 @@
+CREATE TABLE IF NOT EXISTS $jobs$<%-scope.settings.tablename%> (
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	name VARCHAR(1023) UNIQUE,
+	minute INT DEFAULT NULL,
+	hour INT DEFAULT NULL,
+	day INT DEFAULT NULL,
+	week_day INT DEFAULT NULL,
+	month INT DEFAULT NULL,
+	year INT DEFAULT NULL,
+	data TEXT DEFAULT NULL,
+	metadata TEXT DEFAULT NULL,
+	dispatcher VARCHAR(1023) DEFAULT NULL,
+	status INT DEFAULT 0, # 0: stopped | 1: started | 2: ...
+	is_locked INT DEFAULT 0,
+	comments TEXT
+);
+
+CREATE TABLE IF NOT EXISTS $hist$$jobs$<%-scope.settings.tablename%> (
+	id INT,
+	name VARCHAR(1023),
+	minute INT DEFAULT NULL,
+	hour INT DEFAULT NULL,
+	day INT DEFAULT NULL,
+	week_day INT DEFAULT NULL,
+	month INT DEFAULT NULL,
+	year INT DEFAULT NULL,
+	data TEXT DEFAULT NULL,
+	metadata TEXT DEFAULT NULL,
+	dispatcher VARCHAR(1023) DEFAULT NULL,
+	status INT DEFAULT 0, # 0: stopped | 1: started | 2: ...
+	is_locked INT DEFAULT 0,
+	comments TEXT DEFAULT NULL
+);

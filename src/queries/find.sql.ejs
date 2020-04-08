@@ -1,0 +1,36 @@
+<%
+
+const jobsTable = "$jobs$" + scope.settings.tablename;
+let whereJobs = [];
+if(args.length !== 0) {
+	whereJobs = utils.whereToSQL(args[0], jobsTable);
+}
+let orderJobs = false, limitJobs = false;
+if(args.length > 1) {
+	const others = args[1];
+	if(Array.isArray(others) || typeof others !== "object") {
+		throw new Error("Argument 2 must be a non-array object to <find>");
+	}
+	if(others.order) {
+		orderJobs = others.order;
+	}
+	if(others.limit) {
+		limitJobs = others.limit;
+	}
+}
+
+%>
+
+SELECT * FROM <%-jobsTable%><% if(whereJobs.length !== 0) { %>
+	WHERE <%-whereJobs%>
+<% }
+if(orderJobs) {
+	%>
+	ORDER BY <%-[].concat(orderJobs).join(", ")%><%
+}
+if(limitJobs) {
+	%>
+	LIMIT <%-limitJobs%><%
+}
+
+%>;

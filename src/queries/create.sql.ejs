@@ -1,0 +1,48 @@
+<%
+	
+if(args.length === 0) {
+	throw new Error("Argument 1 is required to <create>");
+}
+if(typeof args[0] !== "object") {
+	throw new Error("Argument 1 must be an object to <create>");
+}
+const items = [].concat(args[0]);
+if(items.length === 0) {
+	throw new Error("Argument 1 must provide at least 1 item to <create>");
+}
+const fields = Object.keys(items[0]);
+if(fields.length === 0) {
+	throw new Error("Argument 1 must provide at least 1 item with 1 property to <create>");
+}
+
+%>
+
+INSERT INTO $jobs$<%-scope.settings.tablename%> (
+	<%
+	fields.forEach((prop, propIndex) => {
+		if(propIndex !== 0) {
+			%>, <%
+		}
+		%><%-SQL.escapeId(prop)%><%
+	});
+	%>
+) VALUES 
+	<%
+	items.forEach((item, itemIndex) => {
+		if(typeof item.name !== "string") {
+			throw new Error("Job property <name> must be a string to <create>");
+		}
+		if(itemIndex !== 0) {
+			%>,<%
+		}
+		%>(<%
+		fields.forEach((prop, propIndex) => {
+			if(propIndex !== 0) {
+				%>, <%
+			}
+			const value = item[prop];
+			%><%-SQL.escape(value)%><%
+		});
+		%>)<%
+	});
+	%>;
