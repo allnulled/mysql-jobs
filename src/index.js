@@ -31,7 +31,7 @@ class Job {
 
 /**
  * 
- * #### const MySQLJobs = require("mysql-jobs");
+ * #### `const MySQLJobs = require("mysql-jobs")`
  * 
  * @type Class
  * @description Class that contains the whole API of the package.

@@ -1,5 +1,5 @@
 
-#### const MySQLJobs = require("mysql-jobs");
+#### `const MySQLJobs = require("mysql-jobs")`
 
 
 
@@ -93,52 +93,6 @@
 
 -----
 
-#### `jobs.create(values:Object)`
-
-
-
-**Type**:  Method
-
-
-**Parameter**: 
-
-
-  - `values:Object`. Required. Values of the new job in database.
-
-
-**Return**:  `Promise`
-
-
-**Description**:  Creates a new job in the database.
-
-
-
-
------
-
-#### `jobs.delete(whereJob:Object|Array)`
-
-
-
-**Type**:  Method
-
-
-**Parameter**: 
-
-
-  - `whereJob:Object|Array`. Required. Conditions that need to be met to delete the job in the database.
-
-
-**Return**:  `Promise`
-
-
-**Description**:  Deletes all jobs that acomplish certain condition/s.
-
-
-
-
------
-
 #### `jobs.createTables()`
 
 
@@ -150,6 +104,23 @@
 
 
 **Description**:  Creates the database tables, if they do not exist.
+
+
+
+
+-----
+
+#### `jobs.deleteTables()`
+
+
+
+**Type**:  Method
+
+
+**Return**:  `Promise`
+
+
+**Description**:  Deletes the database tables, if they exist.
 
 
 
@@ -202,17 +173,46 @@
 
 -----
 
-#### `jobs.deleteTables()`
+#### `jobs.unlock(whereJob:Object|Array)`
 
 
 
 **Type**:  Method
 
 
+**Parameter**: 
+
+
+  - `whereJob:Object|Array`. Required. Conditions that need to be met to unlock some job/s of the database.
+
+
 **Return**:  `Promise`
 
 
-**Description**:  Deletes the database tables, if they exist.
+**Description**:  Sets the flag of `is_locked` to `0` in the database.
+
+
+
+
+-----
+
+#### `jobs.delete(whereJob:Object|Array)`
+
+
+
+**Type**:  Method
+
+
+**Parameter**: 
+
+
+  - `whereJob:Object|Array`. Required. Conditions that need to be met to delete the job in the database.
+
+
+**Return**:  `Promise`
+
+
+**Description**:  Deletes all jobs that acomplish certain condition/s.
 
 
 
@@ -245,7 +245,7 @@
 
 -----
 
-#### `jobs.unlock(whereJob:Object|Array)`
+#### `jobs.create(values:Object)`
 
 
 
@@ -255,13 +255,13 @@
 **Parameter**: 
 
 
-  - `whereJob:Object|Array`. Required. Conditions that need to be met to unlock some job/s of the database.
+  - `values:Object`. Required. Values of the new job in database.
 
 
 **Return**:  `Promise`
 
 
-**Description**:  Sets the flag of `is_locked` to `0` in the database.
+**Description**:  Creates a new job in the database.
 
 
 
