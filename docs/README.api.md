@@ -13,6 +13,34 @@
 
 -----
 
+#### `const jobs = MySQLJobs.create(options:Object)`
+
+
+
+**Type**:  Static method
+
+
+**Parameter**: 
+
+
+  - `options:Object`. Optional. Properties and methods to override of the class instance.
+
+
+**Returns**:  `jobs:Object`. A fresh instance of MySQLJobs, already configured and loaded.
+
+
+**Description**:  This methods calls the constructor under the hood. It:
+
+   - Sets up its own variables
+   - Turns on debug and trace environmental variables (`process.env.DEBUG`)
+   - Initializes templates. Note that this operation reads files synchronously. This makes this operation not adecuate for critically-performant environments.
+   - Initializes database connection. This operation is not asynchronous, though, and it does not make the connection stablished or ensured at all. This will happen on the first query.
+
+
+
+
+-----
+
 #### `jobs.start(whereJobs:Object|Array)`
 
 
@@ -110,6 +138,29 @@
 
 -----
 
+#### `jobs.create(values:Object)`
+
+
+
+**Type**:  Method
+
+
+**Parameter**: 
+
+
+  - `values:Object`. Required. Values of the new job in database.
+
+
+**Return**:  `Promise`
+
+
+**Description**:  Creates a new job in the database.
+
+
+
+
+-----
+
 #### `jobs.deleteTables()`
 
 
@@ -121,75 +172,6 @@
 
 
 **Description**:  Deletes the database tables, if they exist.
-
-
-
-
------
-
-#### `jobs.find(whereJob:Object|Array)`
-
-
-
-**Type**:  Method
-
-
-**Parameter**: 
-
-
-  - `whereJob:Object|Array`. Required. Conditions that need to be met to list the job of the database as 'found'.
-
-
-**Return**:  `Promise`
-
-
-**Description**:  Returns jobs that accomplish some condition/s.
-
-
-
-
------
-
-#### `jobs.lock(whereJob:Object|Array)`
-
-
-
-**Type**:  Method
-
-
-**Parameter**: 
-
-
-  - `whereJob:Object|Array`. Required. Conditions that need to be met to lock some job/s of the database.
-
-
-**Return**:  `Promise`
-
-
-**Description**:  Sets the flag of `is_locked` to `1` in the database.
-
-
-
-
------
-
-#### `jobs.unlock(whereJob:Object|Array)`
-
-
-
-**Type**:  Method
-
-
-**Parameter**: 
-
-
-  - `whereJob:Object|Array`. Required. Conditions that need to be met to unlock some job/s of the database.
-
-
-**Return**:  `Promise`
-
-
-**Description**:  Sets the flag of `is_locked` to `0` in the database.
 
 
 
@@ -245,7 +227,7 @@
 
 -----
 
-#### `jobs.create(values:Object)`
+#### `jobs.find(whereJob:Object|Array)`
 
 
 
@@ -255,13 +237,59 @@
 **Parameter**: 
 
 
-  - `values:Object`. Required. Values of the new job in database.
+  - `whereJob:Object|Array`. Required. Conditions that need to be met to list the job of the database as 'found'.
 
 
 **Return**:  `Promise`
 
 
-**Description**:  Creates a new job in the database.
+**Description**:  Returns jobs that accomplish some condition/s.
+
+
+
+
+-----
+
+#### `jobs.unlock(whereJob:Object|Array)`
+
+
+
+**Type**:  Method
+
+
+**Parameter**: 
+
+
+  - `whereJob:Object|Array`. Required. Conditions that need to be met to unlock some job/s of the database.
+
+
+**Return**:  `Promise`
+
+
+**Description**:  Sets the flag of `is_locked` to `0` in the database.
+
+
+
+
+-----
+
+#### `jobs.lock(whereJob:Object|Array)`
+
+
+
+**Type**:  Method
+
+
+**Parameter**: 
+
+
+  - `whereJob:Object|Array`. Required. Conditions that need to be met to lock some job/s of the database.
+
+
+**Return**:  `Promise`
+
+
+**Description**:  Sets the flag of `is_locked` to `1` in the database.
 
 
 

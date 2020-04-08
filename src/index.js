@@ -43,6 +43,24 @@ class JobSystem {
 		return Job;
 	}
 
+	/**
+	 * 
+	 * -----
+	 * 
+	 * #### `const jobs = MySQLJobs.create(options:Object)`
+	 * 
+	 * @type Static method
+	 * @parameter
+	 * @parameter  - `options:Object`. Optional. Properties and methods to override of the class instance.
+	 * @returns `jobs:Object`. A fresh instance of MySQLJobs, already configured and loaded.
+	 * @description This methods calls the constructor under the hood. It:
+	 * 
+	 *    - Sets up its own variables
+	 *    - Turns on debug and trace environmental variables (`process.env.DEBUG`)
+	 *    - Initializes templates. Note that this operation reads files synchronously. This makes this operation not adecuate for critically-performant environments.
+	 *    - Initializes database connection. This operation is not asynchronous, though, and it does not make the connection stablished or ensured at all. This will happen on the first query.
+	 * 
+	 */
 	static create(...args) {
 		return new this(...args);
 	}
