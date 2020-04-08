@@ -22,16 +22,16 @@ const MySQLJobs = require("mysql-jobs");
 
 ```js
 const jobs = await MySQLJobs.create({
-	debug: true,
-	settings: {
-		connection: {
-			user: "test",
-			password: "test",
-			database: "test",
-			host: "127.0.0.1",
-			port: 3306
-		}
-	}
+  debug: true,
+  settings: {
+    connection: {
+      user: "test",
+      password: "test",
+      database: "test",
+      host: "127.0.0.1",
+      port: 3306
+    }
+  }
 });
 ```
 

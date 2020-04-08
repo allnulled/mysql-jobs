@@ -64,23 +64,6 @@
 
 -----
 
-#### `jobs.deleteTables()`
-
-
-
-**Type**:  Method
-
-
-**Return**:  `Promise`
-
-
-**Description**:  Deletes the database tables, if they exist.
-
-
-
-
------
-
 #### `jobs.find(whereJob:Object|Array)`
 
 
@@ -144,6 +127,32 @@
 
 
 **Description**:  Sets the flag of `is_locked` to `0` in the database.
+
+
+
+
+-----
+
+#### `jobs.update(whereJob:Object|Array)`
+
+
+
+**Type**:  Method
+
+
+**Parameter**: 
+
+
+  - `whereJob:Object|Array`. Required. Conditions that need to be met to unlock some job/s of the database.
+
+
+  - `values:Object`. Required. Values to be set to the jobs found by the `whereJob` conditions.
+
+
+**Return**:  `Promise`
+
+
+**Description**:  Sets any value of the database to any job that mets the passed conditions.
 
 
 
@@ -242,26 +251,17 @@
 
 -----
 
-#### `jobs.update(whereJob:Object|Array)`
+#### `jobs.deleteTables()`
 
 
 
 **Type**:  Method
 
 
-**Parameter**: 
-
-
-  - `whereJob:Object|Array`. Required. Conditions that need to be met to unlock some job/s of the database.
-
-
-  - `values:Object`. Required. Values to be set to the jobs found by the `whereJob` conditions.
-
-
 **Return**:  `Promise`
 
 
-**Description**:  Sets any value of the database to any job that mets the passed conditions.
+**Description**:  Deletes the database tables, if they exist.
 
 
 

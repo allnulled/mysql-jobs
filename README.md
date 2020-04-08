@@ -22,16 +22,16 @@ const MySQLJobs = require("mysql-jobs");
 
 ```js
 const jobs = await MySQLJobs.create({
-	debug: true,
-	settings: {
-		connection: {
-			user: "test",
-			password: "test",
-			database: "test",
-			host: "127.0.0.1",
-			port: 3306
-		}
-	}
+  debug: true,
+  settings: {
+    connection: {
+      user: "test",
+      password: "test",
+      database: "test",
+      host: "127.0.0.1",
+      port: 3306
+    }
+  }
 });
 ```
 
@@ -179,23 +179,6 @@ await jobs.deleteTables({});
 
 -----
 
-#### `jobs.deleteTables()`
-
-
-
-**Type**:  Method
-
-
-**Return**:  `Promise`
-
-
-**Description**:  Deletes the database tables, if they exist.
-
-
-
-
------
-
 #### `jobs.find(whereJob:Object|Array)`
 
 
@@ -259,6 +242,32 @@ await jobs.deleteTables({});
 
 
 **Description**:  Sets the flag of `is_locked` to `0` in the database.
+
+
+
+
+-----
+
+#### `jobs.update(whereJob:Object|Array)`
+
+
+
+**Type**:  Method
+
+
+**Parameter**: 
+
+
+  - `whereJob:Object|Array`. Required. Conditions that need to be met to unlock some job/s of the database.
+
+
+  - `values:Object`. Required. Values to be set to the jobs found by the `whereJob` conditions.
+
+
+**Return**:  `Promise`
+
+
+**Description**:  Sets any value of the database to any job that mets the passed conditions.
 
 
 
@@ -357,26 +366,17 @@ await jobs.deleteTables({});
 
 -----
 
-#### `jobs.update(whereJob:Object|Array)`
+#### `jobs.deleteTables()`
 
 
 
 **Type**:  Method
 
 
-**Parameter**: 
-
-
-  - `whereJob:Object|Array`. Required. Conditions that need to be met to unlock some job/s of the database.
-
-
-  - `values:Object`. Required. Values to be set to the jobs found by the `whereJob` conditions.
-
-
 **Return**:  `Promise`
 
 
-**Description**:  Sets any value of the database to any job that mets the passed conditions.
+**Description**:  Deletes the database tables, if they exist.
 
 
 
